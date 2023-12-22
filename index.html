@@ -1,0 +1,87 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    #uploadedImage {
+      max-width: 100%;
+    }
+
+    #newButtonContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    canvas {
+      display: block;
+      cursor: pointer;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js"></script>
+</head>
+<body>
+  <input type="file" id="imageInput" accept="image/*" style="display: none;"> <!-- Hide the file input button -->
+  <img id="uploadedImage" alt="">
+  <div id="newButtonContainer">
+    <!-- The p5.js animation button -->
+    
+  </div>
+  <script>
+    let numSquares = 10;
+    let maxSize = 80;
+    let minSize = 20;
+    let sizeChangeSpeed = 0.02;
+    let squares = [];
+
+    function setup() {
+      let buttonCanvas = createCanvas(100, 100).parent("newButtonContainer"); // Attach canvas to the "newButtonContainer" div at the top-left
+      noFill();
+      stroke(255);
+      frameRate(30);
+
+      for (let i = 0; i < numSquares; i++) {
+        squares.push({ x: width / 2, y: height / 2, index: i });
+      }
+
+      buttonCanvas.mousePressed(buttonClicked);
+    }
+
+    function draw() {
+      background(0);
+
+      for (let i = 0; i < squares.length; i++) {
+        let scaleFactor = abs(sin(frameCount * sizeChangeSpeed + i * PI / numSquares));
+
+        let size;
+        if (i < numSquares / 2) {
+          size = lerp(minSize, maxSize, scaleFactor);
+        } else {
+          size = lerp(maxSize, minSize, scaleFactor);
+        }
+
+        square(squares[i].x - size / 2, squares[i].y - size / 2, size);
+      }
+    }
+
+    function buttonClicked() {
+      // Trigger the file input when the button is clicked
+      document.getElementById("imageInput").click();
+    }
+
+    // Handle image upload
+    document.getElementById("imageInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          let uploadedImage = document.getElementById("uploadedImage");
+          uploadedImage.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>
